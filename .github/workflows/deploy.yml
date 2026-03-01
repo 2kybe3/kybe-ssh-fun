@@ -32,8 +32,8 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  deploy-backend:
-    name: Build, Push & Deploy Backend
+  deploy-ssh-fun:
+    name: Build, Push & Deploy ssh-fun
     runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
 
@@ -74,7 +74,7 @@ jobs:
           key: ${{ secrets.RUNNER_SSH_KEY }}
           overwrite: true
           source: "docker-compose.yml"
-          target: "/opt/backend/"
+          target: "/opt/ssh-fun/"
 
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
@@ -85,7 +85,7 @@ jobs:
           script: |
             echo "${{ secrets.REGISTRY_PASS }}" | docker login ${{ env.REGISTRY_URL }} -u "${{ vars.REGISTRY_USER }}" --password-stdin
             
-            cd /opt/backend
+            cd /opt/ssh-fun
             docker compose pull
             docker compose up -d --force-recreate --remove-orphans
           envs: REGISTRY_URL,REGISTRY_USER
