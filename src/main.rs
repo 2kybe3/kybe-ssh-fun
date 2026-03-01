@@ -13,7 +13,7 @@ fn main() -> anyhow::Result<()> {
 
         if let Some(arg) = args.first() {
             match arg.as_str() {
-                "gpg" | "pgp" =>  {
+                "gpg" | "pgp" => {
                     println!("{}", PGP_KEY);
                     return Ok(());
                 }
