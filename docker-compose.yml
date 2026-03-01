@@ -1,0 +1,9 @@
+services:
+  kybe-ssh-fun:
+    build: .
+    container_name: kybe-ssh-fun
+    ports:
+      - "2222:2222"
+    volumes:
+      # ssh-keygen -t ed25519 -f ./ssh_host_ed25519_key -N ""
+      - ./ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
