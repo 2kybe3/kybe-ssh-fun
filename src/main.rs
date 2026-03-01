@@ -35,8 +35,8 @@ fn main() -> anyhow::Result<()> {
                     println!("bye");
                     break;
                 }
-                "hello" => println!("Hello rando"),
-                "help" => println!("Avaible commands: help, hello, exit"),
+                "pgp" => println!("{}", PGP_KEY),
+                "help" => println!("Avaible commands: help, pgp, exit"),
                 "" => continue,
                 _ => println!("Unknown command: {}", line),
             },

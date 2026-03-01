@@ -7,3 +7,10 @@ services:
     volumes:
       # ssh-keygen -t ed25519 -f ./ssh_host_ed25519_key -N ""
       - ./ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256m
+        reservations:
+          cpus: 0.2

@@ -12,8 +12,8 @@ RUN cargo build --release --target x86_64-unknown-linux-musl
 FROM alpine:latest
 RUN apk add --no-cache openssh
 
-RUN adduser -D -s /usr/local/bin/kybe-ssh-fun utilsuser
-RUN echo "utilsuser:" | chpasswd
+RUN adduser -D -s /usr/local/bin/kybe-ssh-fun kybe
+RUN echo "kybe:" | chpasswd
 
 RUN echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config
 RUN echo "Port 2222" >> /etc/ssh/sshd_config
