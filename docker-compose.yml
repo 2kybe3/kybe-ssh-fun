@@ -1,6 +1,6 @@
 services:
   kybe-ssh-fun:
-    build: .
+    image: reg.kybe.xyz/kybe-pub/kybe-ssh-fun:latest
     container_name: kybe-ssh-fun
     ports:
       - "2222:2222"
