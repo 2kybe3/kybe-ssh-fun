@@ -6,7 +6,7 @@ use russh::{
     server::{self, Server as _},
 };
 use tokio::{net::TcpListener, sync::Mutex};
-use tracing::info;
+use tracing::{info, warn};
 
 const PGP_KEY: &str = include_str!("../static/pgp.txt");
 
@@ -46,7 +46,7 @@ impl server::Server for Server {
         s
     }
     fn handle_session_error(&mut self, error: <Self::Handler as server::Handler>::Error) {
-        eprintln!("Session error: {error:#?}");
+        warn!(error = ?error, "session_error");
     }
 }
 
