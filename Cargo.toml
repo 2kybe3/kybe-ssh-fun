@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+russh = "0.57.1"
 anyhow = "1.0.102"
-rustyline = "17.0.2"
+tracing = "0.1.44"
+tokio = { version = "1.49.0", features = ["full"] }
+tracing-subscriber = "0.3.22"
