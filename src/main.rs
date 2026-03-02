@@ -1,7 +1,9 @@
 use std::{collections::HashMap, fs, path::Path, sync::Arc};
 
 use russh::{
-    ChannelId, CryptoVec, Pty, keys::{PrivateKey, ssh_key::rand_core::OsRng}, server::{self, Server as _}
+    ChannelId, CryptoVec, Pty,
+    keys::{PrivateKey, ssh_key::rand_core::OsRng},
+    server::{self, Server as _},
 };
 use tokio::{net::TcpListener, sync::Mutex};
 use tracing::info;
@@ -237,19 +239,45 @@ impl server::Handler for Server {
         Ok(())
     }
 
+    async fn auth_password(
+        &mut self,
+        user: &str,
+        password: &str,
+    ) -> Result<server::Auth, Self::Error> {
+        info!(user = ?user, password = ?password, "auth_password");
+        Ok(server::Auth::Accept)
+    }
+
+    async fn auth_none(&mut self, user: &str) -> Result<server::Auth, Self::Error> {
+        info!(user = ?user, "auth_none");
+        Ok(server::Auth::Accept)
+    }
+
     async fn auth_publickey(
         &mut self,
-        _: &str,
-        _: &russh::keys::ssh_key::PublicKey,
+        user: &str,
+        public_key: &russh::keys::ssh_key::PublicKey,
     ) -> Result<server::Auth, Self::Error> {
+        info!(user = ?user, public_key = ?public_key, "auth_publickey");
         Ok(server::Auth::Accept)
     }
 
     async fn auth_openssh_certificate(
         &mut self,
-        _: &str,
-        _: &russh::keys::Certificate,
+        user: &str,
+        certificate: &russh::keys::Certificate,
     ) -> Result<server::Auth, Self::Error> {
+        info!(user = ?user, certificate = ?certificate, "auth_openssh_certificate");
+        Ok(server::Auth::Accept)
+    }
+
+    async fn auth_keyboard_interactive<'a>(
+        &'a mut self,
+        user: &str,
+        submethods: &str,
+        _response: Option<server::Response<'a>>,
+    ) -> Result<server::Auth, Self::Error> {
+        info!(user = ?user, submethods = ?submethods, "auth_keyboard_interactive");
         Ok(server::Auth::Accept)
     }
 }
@@ -325,7 +353,11 @@ fn load_or_generate_key(path: &str) -> anyhow::Result<PrivateKey> {
         Ok(PrivateKey::from_openssh(&data)?)
     } else {
         let key = PrivateKey::random(&mut OsRng, russh::keys::Algorithm::Ed25519)?;
-        fs::write(path, key.clone().to_openssh(russh::keys::ssh_key::LineEnding::CRLF)? )?;
+        fs::write(
+            path,
+            key.clone()
+                .to_openssh(russh::keys::ssh_key::LineEnding::CRLF)?,
+        )?;
         Ok(key)
     }
 }
