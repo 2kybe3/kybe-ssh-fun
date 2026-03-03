@@ -73,11 +73,10 @@ impl server::Handler for Server {
                     session.data(channel, CryptoVec::from("test working maybe..."))?;
                     session.close(channel)?;
                 }
-                "" => {}
                 _ => {
                     session.data(
                         channel,
-                        CryptoVec::from(format!("get that dirty {} away from me", cmd)),
+                        CryptoVec::from(format!("get that dirty \"{}\" away from me", cmd)),
                     )?;
                     session.close(channel)?;
                 }
