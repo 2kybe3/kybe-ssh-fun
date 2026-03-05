@@ -9,6 +9,7 @@ use tokio::{net::TcpListener, sync::Mutex};
 use tracing::{info, warn};
 
 const PGP_KEY: &str = include_str!("../static/pgp.txt");
+const IDENTITY: &str = include_str!("../static/identity.txt");
 
 #[derive(Clone, Debug)]
 #[allow(unused)]
@@ -65,12 +66,12 @@ impl server::Handler for Server {
         let args: Vec<&str> = cmd.split(" ").collect();
         if let Some(main) = args.first() {
             match *main {
-                "pgp" | "gpg" => {
-                    session.data(channel, CryptoVec::from(PGP_KEY))?;
+                "ident" | "identity" | "who" => {
+                    session.data(channel, CryptoVec::from(IDENTITY))?;
                     session.close(channel)?;
                 }
-                "test" => {
-                    session.data(channel, CryptoVec::from("test working maybe..."))?;
+                "pgp" | "gpg" => {
+                    session.data(channel, CryptoVec::from(PGP_KEY))?;
                     session.close(channel)?;
                 }
                 _ => {
@@ -148,8 +149,12 @@ impl server::Handler for Server {
 
                         match input.as_str() {
                             "help" => output.push(CryptoVec::from(
-                                "Commands: pgp, ping, clear, help, exit\r\n",
+                                "Commands: ident, pgp, ping, clear, help, exit\r\n",
                             )),
+                            "ident" | "identity" | "who" => output.push(CryptoVec::from(format!(
+                                "{}\r\n",
+                                IDENTITY.replace("\n", "\r\n")
+                            ))),
                             "gpg" | "pgp" => output.push(CryptoVec::from(format!(
                                 "{}\r\n",
                                 PGP_KEY.replace("\n", "\r\n")
