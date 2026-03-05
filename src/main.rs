@@ -78,7 +78,7 @@ impl server::Handler for Server {
                     session.data(
                         channel,
                         CryptoVec::from(format!(
-                            "get that dirty \"{}\" away from me, try \"ident, pgp\"",
+                            "get that dirty \"{}\" away from me, try \"ident, pgp\"\n",
                             cmd
                         )),
                     )?;
