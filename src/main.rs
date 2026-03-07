@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, path::Path, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, fs, path::Path, sync::Arc};
 
 use russh::{
     ChannelId, CryptoVec, Pty,
@@ -246,45 +246,55 @@ impl server::Handler for Server {
         Ok(())
     }
 
+    async fn auth_keyboard_interactive<'a>(
+        &'a mut self,
+        user: &str,
+        _submethods: &str,
+        response: Option<server::Response<'a>>,
+    ) -> Result<server::Auth, Self::Error> {
+        if user.contains("tilley") {
+            if let Some(resp) = response {
+                let mut results = Vec::new();
+
+                for item in resp {
+                    results.push(item.to_vec());
+                }
+
+                let first = results.first();
+                match first {
+                    Some(first) => {
+                        let res = String::from_utf8_lossy(first).to_string();
+                        info!("tilley result {res}");
+                        if res != "100" {
+                            return Ok(server::Auth::reject());
+                        } else {
+                            return Ok(server::Auth::Accept);
+                        }
+                    }
+                    None => {
+                        return Ok(server::Auth::reject());
+                    }
+                };
+            }
+
+            let prompts: Cow<'static, [(Cow<'static, str>, bool)]> =
+                Cow::Borrowed(&[(Cow::Borrowed("Enter your gay level: "), true)]);
+            info!("tilley detected");
+            return Ok(server::Auth::Partial {
+                name: Cow::Borrowed("Additional tests required"),
+                instructions: Cow::Borrowed("enter your level of gayness (1-100)"),
+                prompts,
+            });
+        }
+        Ok(server::Auth::Accept)
+    }
+
     async fn auth_password(
         &mut self,
         user: &str,
         password: &str,
     ) -> Result<server::Auth, Self::Error> {
         info!(user = ?user, password = ?password, "auth_password");
-        Ok(server::Auth::Accept)
-    }
-
-    async fn auth_none(&mut self, user: &str) -> Result<server::Auth, Self::Error> {
-        info!(user = ?user, "auth_none");
-        Ok(server::Auth::Accept)
-    }
-
-    async fn auth_publickey(
-        &mut self,
-        user: &str,
-        public_key: &russh::keys::ssh_key::PublicKey,
-    ) -> Result<server::Auth, Self::Error> {
-        info!(user = ?user, public_key = ?public_key, "auth_publickey");
-        Ok(server::Auth::Accept)
-    }
-
-    async fn auth_openssh_certificate(
-        &mut self,
-        user: &str,
-        certificate: &russh::keys::Certificate,
-    ) -> Result<server::Auth, Self::Error> {
-        info!(user = ?user, certificate = ?certificate, "auth_openssh_certificate");
-        Ok(server::Auth::Accept)
-    }
-
-    async fn auth_keyboard_interactive<'a>(
-        &'a mut self,
-        user: &str,
-        submethods: &str,
-        _response: Option<server::Response<'a>>,
-    ) -> Result<server::Auth, Self::Error> {
-        info!(user = ?user, submethods = ?submethods, "auth_keyboard_interactive");
         Ok(server::Auth::Accept)
     }
 }
